@@ -14,6 +14,7 @@
   align-items: center;
   height: 100vh; /* Full screen height */
   background-color: #303035; /* Dark background */
+  padding: 20px; /* Added padding for smaller screens */
 }
 
 .logo h1 {
@@ -44,4 +45,20 @@
 .getStartedButton:hover {
   background-color: #ffcb57;
   color: #303035;
+}
+
+/* Media Query for Devices with a Max Width of 600px */
+@media (max-width: 600px) {
+ 
+
+  .logo h1 {
+    font-size: 4rem; /* Smaller font size for smaller screens */
+    text-align: center; /* Center align text */
+  }
+
+  .getStartedButton {
+    margin-top: 15px; /* Adjusted margin for smaller screens */
+    padding: 8px 16px; /* Reduced padding */
+    font-size: 1.2rem; /* Smaller font size */
+  }
 }
