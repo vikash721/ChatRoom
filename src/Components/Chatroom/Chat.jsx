@@ -1,45 +1,45 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { addDoc, collection, serverTimestamp, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { auth, db } from '../../firebase-config';
-import styles from './Chat.module.css'; // Import the CSS module
-import { useSwipeable } from 'react-swipeable'; // Import the swipeable library
+import styles from './Chat.module.css';
+import { useSwipeable } from 'react-swipeable';
+import Header from '../Headers/Header';
+import { useParams } from 'react-router-dom';
 
-const bannedWords = ['badword1', 'badword2']; // Example banned words list
+const bannedWords = ['badword1', 'badword2'];
 
-const ChatRoom = ({ room }) => {
+const ChatRoom = ({ onSignOut }) => {
+  const { roomName } = useParams();
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const [showBranding, setShowBranding] = useState(true); // State for branding visibility
-  const [replyingTo, setReplyingTo] = useState(null); // State to manage reply
+  const [showBranding, setShowBranding] = useState(true);
+  const [replyingTo, setReplyingTo] = useState(null);
 
   const messagesRef = collection(db, 'messages');
-  const endOfMessagesRef = useRef(null); // Ref for the end of the messages list
+  const endOfMessagesRef = useRef(null);
 
   useEffect(() => {
-    // Check local storage for branding visibility preference
     const brandingHidden = localStorage.getItem('brandingHidden') === 'true';
     setShowBranding(!brandingHidden);
 
-    const queryMessages = query(messagesRef, where('room', '==', room), orderBy('createdAt'));
+    const queryMessages = query(messagesRef, where('room', '==', roomName), orderBy('createdAt'));
 
     const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
       let fetchedMessages = [];
       snapshot.forEach((doc) => {
         fetchedMessages.push({ ...doc.data(), id: doc.id });
       });
-      setMessages(fetchedMessages); // Update the state with the new messages
+      setMessages(fetchedMessages);
     });
 
     return () => unsubscribe();
-  }, [room]);
+  }, [roomName]);
 
   useEffect(() => {
-    // Scroll to the bottom whenever messages change
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const filterProfanity = (text) => {
-    // Replace banned words with asterisks
     const regex = new RegExp(`\\b(${bannedWords.join('|')})\\b`, 'gi');
     return text.replace(regex, '****');
   };
@@ -49,25 +49,24 @@ const ChatRoom = ({ room }) => {
     if (newMessage === '') return;
 
     const filteredMessage = filterProfanity(newMessage);
+    const currentUser = auth.currentUser;
 
     await addDoc(messagesRef, {
       text: filteredMessage,
       createdAt: serverTimestamp(),
-      user: auth.currentUser.displayName,
-      room,
-      // Reply information is not saved to the database
+      user: currentUser ? currentUser.displayName : 'Anonymous',
+      room: roomName,
     });
 
-    setNewMessage(''); // Reset the input field
-    setReplyingTo(null); // Clear the reply state
+    setNewMessage('');
+    setReplyingTo(null);
   };
 
   const handleCloseBranding = () => {
     setShowBranding(false);
-    localStorage.setItem('brandingHidden', 'true'); // Remember user's choice
+    localStorage.setItem('brandingHidden', 'true');
   };
 
-  // Swipeable handlers
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
       const messageId = eventData.event.currentTarget.dataset.id;
@@ -78,9 +77,7 @@ const ChatRoom = ({ room }) => {
 
   return (
     <div className={styles['chat-app']}>
-      <div className={styles['header']}>
-        <h1>{`Room: ${room.toUpperCase()}`}</h1>
-      </div>
+      <Header roomName={roomName} onCloseBranding={handleCloseBranding} showBranding={showBranding} />
 
       <div className={styles['messages']}>
         {messages.map((message) => (
@@ -88,11 +85,10 @@ const ChatRoom = ({ room }) => {
             key={message.id}
             data-id={message.id}
             className={`${styles['message']} ${
-              message.user === auth.currentUser.displayName ? styles['sent'] : styles['received']
+              message.user === (auth.currentUser ? auth.currentUser.displayName : 'Anonymous') ? styles['sent'] : styles['received']
             }`}
             {...swipeHandlers}
           >
-            {/* Display username above the message */}
             <div className={styles['username']}>{message.user}</div>
             <div className={styles['message-bubble']}>
               {replyingTo && replyingTo.id === message.id && (
@@ -104,7 +100,6 @@ const ChatRoom = ({ room }) => {
             </div>
           </div>
         ))}
-        {/* Ref for scrolling to the bottom */}
         <div ref={endOfMessagesRef} />
       </div>
 
@@ -119,13 +114,6 @@ const ChatRoom = ({ room }) => {
           Send
         </button>
       </form>
-
-      {showBranding && (
-        <div className={styles['branding']}>
-          <span className={styles['branding-text']}>Designed and Developed by Vikash</span>
-          <button className={styles['close-button']} onClick={handleCloseBranding}>×</button>
-        </div>
-      )}
     </div>
   );
 };
