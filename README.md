@@ -11,19 +11,19 @@ ChatRoom is a web-based application that enables users to engage in real-time, a
 
 ## Technologies Used
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Node.js, Express.js
-- **Real-Time Communication**: Socket.IO
+- **Frontend**: React.js
+- **Backend**: Firebase
+- **Real-Time Communication**: Firebase real time database
 - **Database**: Firebase Firestore
 - **Deployment**: Firebase Hosting
 
 ## How It Works
 
-1. **User Connection**: Upon accessing the application, users are assigned a unique identifier.
-2. **Pairing**: The system pairs users randomly for one-on-one chat sessions.
-3. **Messaging**: Users can exchange messages in real-time.
-4. **Session Termination**: Either user can end the chat session, after which they can start a new session with a different user.
-
+1. **Login**: Login to Chatroom using Google
+2. **Join room**: Join or create a new room.
+3. **Invite Friends**: click on 3 dots on top right corner and start chating.
+4. **Messaging**: Users can exchange messages in real-time.
+   
 ## Setup and Installation
 
 To run ChatRoom locally, follow these steps:
@@ -93,11 +93,8 @@ ChatRoom is deployed using Firebase Hosting. To deploy your own version:
    firebase deploy
    ```
 
-## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
 
 Experience ChatRoom live at [chatroom-80f1e.web.app](https://chatroom-80f1e.web.app/) and connect with people around the world.
 ``` 
