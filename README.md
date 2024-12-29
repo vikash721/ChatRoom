@@ -1,4 +1,4 @@
-```markdown
+
 # ChatRoom
 
 ChatRoom is a web-based application that enables users to engage in real-time, anonymous conversations with others. This project was developed during the 3rd semester of my B.Tech in Computer Science and Engineering and is deployed at [chatroom-80f1e.web.app](https://chatroom-80f1e.web.app/).
